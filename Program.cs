@@ -23,15 +23,15 @@ public class Program
         long lastChunkSize = fs.Length % ChunkSize;
         var chunkCount = (int)((fs.Length - lastChunkSize) / ChunkSize);
 
-        br.BaseStream.Position = fs.Length - lastChunkSize;
+        br.BaseStream.Seek(fs.Length - lastChunkSize, SeekOrigin.Begin);
         byte[] chunk = br.ReadBytes(ChunkSize);
 
         byte[] hash = sha256.ComputeHash(chunk);
-        Console.WriteLine(Convert.ToHexString(hash));
+        Console.WriteLine($"Last chunk: {Convert.ToHexString(hash)}");
 
-        for (int i = chunkCount - 1; i >= 0; i++)
+        for (int i = chunkCount - 1; i != 0; i--)
         {
-            br.BaseStream.Position = i * ChunkSize;
+            br.BaseStream.Seek((long)i * ChunkSize, SeekOrigin.Begin);
             chunk = br.ReadBytes(ChunkSize);
             var block = new byte[chunk.Length + hash.Length];
             Buffer.BlockCopy(chunk, 0, block, 0, chunk.Length);
@@ -39,6 +39,6 @@ public class Program
             hash = sha256.ComputeHash(block);
         }
 
-        return null;
+        return hash;
     }
 }
