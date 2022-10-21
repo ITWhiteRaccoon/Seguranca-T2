@@ -27,6 +27,11 @@ public class Program
         using var sha256 = SHA256.Create();
 
         var lastBlockSize = fs.Length % BlockSize;
+        if (lastBlockSize == 0)
+        {
+            lastBlockSize = BlockSize;
+        }
+
         var blockCount = (int)((fs.Length - lastBlockSize) / BlockSize);
 
         br.BaseStream.Seek(fs.Length - lastBlockSize, SeekOrigin.Begin);
